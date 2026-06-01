@@ -10,7 +10,8 @@
         "module": "esnext",
         "target": "es2019",
         "types": ["node"],
-
+        "moduleResolution": "bundler",
+        "ignoreDeprecations": "6.0",
         "allowSyntheticDefaultImports": true,
         // For nodejs:
         // "lib": ["esnext"],
