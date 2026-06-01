@@ -17,13 +17,21 @@ const prisma = new PrismaClient({
     adapter,
 });
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
     res.send("Servidor MovieFlix funcionando");
 });
 
 app.get("/movies", async (req, res) => {
     
-        const movies = await prisma.movies.findMany();
+        const movies = await prisma.movies.findMany({
+            orderBy: {
+                title: "asc",
+            },
+            include: {
+                genres: true,
+                languages: true,
+            },
+        });
         res.json(movies);
   
 });
