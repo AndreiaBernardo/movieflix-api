@@ -1,3 +1,4 @@
+//6 - Configuração do Prisma Client e definição do modelo de dados para filmes, gêneros e idiomas
 import { PrismaClient } from "../generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 
