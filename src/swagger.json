@@ -1,0 +1,116 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MovieFlix API",
+        "version": "1.0.0",
+        "description": "API para gerenciamento de filmes usando Express e Prisma"
+    },
+    "paths": {
+        "/movies": {
+            "get": {
+                "tags": ["Movies"],
+                "summary": "Listar todos os filmes",
+                "responses": {
+                    "200": {
+                        "description": "Lista de filmes retornada com sucesso"
+                    },
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Movie"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Movies"],
+                "summary": "Adicionar um novo filme",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Movie"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Filme criado com sucesso"
+                    }
+                }
+            }
+        },
+        "/movies/{id}": {
+            "delete": {
+                "tags": ["Movies"],
+                "summary": "Excluir um filme existente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Filme excluído com sucesso"
+                    },
+                    "404": {
+                        "description": "Filme não encontrado"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Movie": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "ID do filme"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genre_id": {
+                        "type": "string",
+                        "description": "Gênero do filme"
+                    },
+                    "language_id": {
+                        "type": "string",
+                        "description": "Idioma do filme"
+                    },
+                    "oscar_count": {
+                        "type": "integer",
+                        "description": "Número de Oscars ganhos pelo filme"
+                    },
+
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Data de lançamento do filme"
+                    }
+                },
+                "required": ["title", "release_date"]
+            }
+        }
+    },
+
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ]
+}

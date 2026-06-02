@@ -3,6 +3,8 @@ import "dotenv/config";
 import express from "express";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./swagger.json";
 
 const connectionString = process.env.DATABASE_URL;
 !connectionString;
@@ -18,6 +20,7 @@ const prisma = new PrismaClient({
 });
 
 app.use(express.json());
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //3 - Rotas para manipulação de filmes
 app.get("/", (_, res) => {
