@@ -52,11 +52,9 @@ app.post("/movies", async (req, res) => {
         });
 
         if (movieWithSameTitle) {
-            return res
-                .status(409)
-                .send({
-                    message: "Já existe um filme cadastrado com esse título",
-                });
+            return res.status(409).send({
+                message: "Já existe um filme cadastrado com esse título",
+            });
         }
         // Criar o novo filme/cadastrar o novo filme
         await prisma.movies.create({
@@ -109,6 +107,32 @@ app.put("/movies/:id", async (req, res) => {
 
     //retornar o status correto informando que o filme foi atualizado
     res.status(200).send("Filme atualizado com sucesso");
+});
+
+//10 - Rota para excluir um filme existente, verificando se o filme existe antes de tentar excluí-lo
+app.delete("/movies/:id", async (req, res) => {
+    const id = Number(req.params.id);
+    ///tratando o erro
+    try {
+        // Verificar se o filme existe antes de tentar excluí-lo
+        const movie = await prisma.movies.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!movie) {
+            return res.status(404).send({ message: "Filme não encontrado" });
+        }
+
+        // Excluir o filme
+
+        await prisma.movies.delete({ where: { id } });
+    } catch (error) {
+        return res.status(500).send({ message: "Erro ao excluir filme" });
+    }
+
+    res.status(200).send({ message: "Filme excluído com sucesso" });
 });
 
 //4 - Iniciar o servidor Express
