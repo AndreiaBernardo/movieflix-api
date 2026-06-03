@@ -154,7 +154,7 @@ app.delete("/movies/:id", async (req, res) => {
 });
 
 //11 - Rota para filtrar filmes por genero
-app.get("/movies/:genreName", async (req, res) => {
+app.get("/movies/genre/:genreName", async (req, res) => {
     //receber o nome do gênero pelo parâmetro da rota
     try {
         //filtrar os filmes do banco pelo gênero

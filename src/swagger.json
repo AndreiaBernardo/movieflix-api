@@ -28,6 +28,9 @@
                                 }
                             }
                         }
+                    },
+                    "500": {
+                        "description": "Erro ao buscar filmes"
                     }
                 }
             },
@@ -40,6 +43,13 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/MovieInput"
+                            },
+                            "example": {
+                                "title": "Exemplo de Filme",
+                                "genre_id": 1,
+                                "language_id": 1,
+                                "oscar_count": 0,
+                                "release_date": "2026-06-02"
                             }
                         }
                     }
@@ -47,6 +57,9 @@
                 "responses": {
                     "201": {
                         "description": "Filme criado com sucesso"
+                    },
+                    "400": {
+                        "description": "JSON inválido ou dados faltando"
                     },
                     "409": {
                         "description": "Já existe um filme cadastrado com esse título"
@@ -78,6 +91,13 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/MovieInput"
+                            },
+                            "example": {
+                                "title": "Filme Atualizado",
+                                "genre_id": 1,
+                                "language_id": 1,
+                                "oscar_count": 1,
+                                "release_date": "2026-06-02"
                             }
                         }
                     }
@@ -86,7 +106,9 @@
                     "200": {
                         "description": "Filme atualizado com sucesso"
                     },
-
+                    "400": {
+                        "description": "JSON inválido ou dados faltando"
+                    },
                     "404": {
                         "description": "Filme não encontrado"
                     },
@@ -97,7 +119,7 @@
             },
             "delete": {
                 "tags": ["Movies"],
-                "summary": "Remover um filme ",
+                "summary": "Remover um filme",
                 "parameters": [
                     {
                         "name": "id",
@@ -118,6 +140,40 @@
                     },
                     "500": {
                         "description": "Erro ao excluir filme"
+                    }
+                }
+            }
+        },
+        "/movies/genre/{genreName}": {
+            "get": {
+                "tags": ["Movies"],
+                "summary": "Filtrar filmes por gênero",
+                "parameters": [
+                    {
+                        "name": "genreName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Nome do gênero",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Movie"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao buscar filmes por gênero"
                     }
                 }
             }
@@ -187,8 +243,6 @@
                         "description": "Data de lançamento do filme"
                     }
                 }
-            
-            
             }
         }
     }
