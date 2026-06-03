@@ -1,6 +1,7 @@
 //5 - Configuração do Prisma Client e definição do modelo de dados para filmes, gêneros e idiomas
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
   output   = "../src/generated/prisma"
 }
 

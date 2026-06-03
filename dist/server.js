@@ -1,3 +1,4 @@
+var _a;
 //1 - Importação de módulos e configuração do Prisma Client
 import "dotenv/config";
 import express from "express";
@@ -7,27 +8,19 @@ import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const swaggerDocument = JSON.parse(
-    fs.readFileSync(join(__dirname, "swagger.json"), "utf8")
-);
-
+const swaggerDocument = JSON.parse(fs.readFileSync(join(__dirname, "swagger.json"), "utf8"));
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-    throw new Error(
-        "DATABASE_URL não está definida. Verifique o arquivo .env."
-    );
+    throw new Error("DATABASE_URL não está definida. Verifique o arquivo .env.");
 }
-
 //2 - Configuração do servidor Express e rotas para manipulação de filmes
-const port = Number(process.env.PORT ?? 3000);
+const port = Number((_a = process.env.PORT) !== null && _a !== void 0 ? _a : 3000);
 const app = express();
 app.use(express.json());
-
 // Middleware para capturar erros de JSON inválido enviados no corpo da requisição
-app.use((err: any, req: any, res: any, next: any) => {
+app.use((err, req, res, next) => {
     if (err && err.type === "entity.parse.failed") {
         return res
             .status(400)
@@ -35,16 +28,13 @@ app.use((err: any, req: any, res: any, next: any) => {
     }
     next(err);
 });
-
 const adapter = new PrismaPg({
     connectionString,
 });
 const prisma = new PrismaClient({
     adapter,
 });
-
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 //3 - Rotas para manipulação de filmes
 app.get("/", (_, res) => {
     res.send("Servidor MovieFlix funcionando");
@@ -66,9 +56,7 @@ app.get("/movies", async (req, res) => {
 });
 //8 - Rota para criar um novo filme, verificando se já existe um filme com o mesmo título (case-insensitive)
 app.post("/movies", async (req, res) => {
-    const { title, genre_id, language_id, oscar_count, release_date } =
-        req.body;
-
+    const { title, genre_id, language_id, oscar_count, release_date } = req.body;
     try {
         // Verificar se já existe um filme com o mesmo título (case-insensitive)
         const movieWithSameTitle = await prisma.movies.findFirst({
@@ -76,7 +64,6 @@ app.post("/movies", async (req, res) => {
                 title: { equals: title, mode: "insensitive" },
             },
         });
-
         if (movieWithSameTitle) {
             return res.status(409).send({
                 message: "Já existe um filme cadastrado com esse título",
@@ -93,11 +80,11 @@ app.post("/movies", async (req, res) => {
             },
         });
         res.status(201).send("Filme criado com sucesso");
-    } catch (error) {
+    }
+    catch (error) {
         return res.status(500).send({ message: "Erro ao criar filme" });
     }
 });
-
 //9 - Rota para atualizar um filme existente, verificando se o filme existe e se o novo título não conflita com outro filme (case-insensitive)
 app.put("/movies/:id", async (req, res) => {
     //pegar o id do registro que vai ser atualizado
@@ -112,14 +99,12 @@ app.put("/movies/:id", async (req, res) => {
         if (!movie) {
             return res.status(404).send({ message: "Filme não encontrado" });
         }
-
         //pegando todos os dados que foram alterados no body da requisição
         const data = { ...req.body };
         //transformar a data de string para Date(caso tenha data no projeto)
         data.release_date = data.release_date
             ? new Date(data.release_date)
             : undefined;
-
         //pegar os dados do filme que será atualizado e atualizar ele no prisma
         await prisma.movies.update({
             where: {
@@ -127,14 +112,13 @@ app.put("/movies/:id", async (req, res) => {
             },
             data: data,
         });
-    } catch (error) {
+    }
+    catch (error) {
         return res.status(500).send({ message: "Erro ao atualizar filme" });
     }
-
     //retornar o status correto informando que o filme foi atualizado
     res.status(200).send("Filme atualizado com sucesso");
 });
-
 //10 - Rota para excluir um filme existente, verificando se o filme existe antes de tentar excluí-lo
 app.delete("/movies/:id", async (req, res) => {
     const id = Number(req.params.id);
@@ -146,21 +130,17 @@ app.delete("/movies/:id", async (req, res) => {
                 id,
             },
         });
-
         if (!movie) {
             return res.status(404).send({ message: "Filme não encontrado" });
         }
-
         // Excluir o filme
-
         await prisma.movies.delete({ where: { id } });
-    } catch (error) {
+    }
+    catch (error) {
         return res.status(500).send({ message: "Erro ao excluir filme" });
     }
-
     res.status(200).send({ message: "Filme excluído com sucesso" });
 });
-
 //11 - Rota para filtrar filmes por genero
 app.get("/movies/genre/:genreName", async (req, res) => {
     //receber o nome do gênero pelo parâmetro da rota
@@ -182,7 +162,8 @@ app.get("/movies/genre/:genreName", async (req, res) => {
         });
         //retornar os filmes filtrados na resposta da rota
         res.status(200).send(moviesFilteredByGenreName);
-    } catch (error) {
+    }
+    catch (error) {
         res.status(500).send({ message: "Erro ao filtrar filmes por gênero" });
     }
 });
@@ -190,3 +171,4 @@ app.get("/movies/genre/:genreName", async (req, res) => {
 app.listen(port, () => {
     console.log(`Servidor em execução na porta ${port}`);
 });
+//# sourceMappingURL=server.js.map
