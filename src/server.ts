@@ -7,11 +7,27 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json";
 
 const connectionString = process.env.DATABASE_URL;
-!connectionString;
+if (!connectionString) {
+    throw new Error(
+        "DATABASE_URL não está definida. Verifique o arquivo .env."
+    );
+}
 
 //2 - Configuração do servidor Express e rotas para manipulação de filmes
-const port = 3000;
+const port = Number(process.env.PORT ?? 3000);
 const app = express();
+app.use(express.json());
+
+// Middleware para capturar erros de JSON inválido enviados no corpo da requisição
+app.use((err: any, req: any, res: any, next: any) => {
+    if (err && err.type === "entity.parse.failed") {
+        return res
+            .status(400)
+            .json({ error: "JSON inválido no corpo da requisição" });
+    }
+    next(err);
+});
+
 const adapter = new PrismaPg({
     connectionString,
 });
@@ -19,7 +35,6 @@ const prisma = new PrismaClient({
     adapter,
 });
 
-app.use(express.json());
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //3 - Rotas para manipulação de filmes
@@ -142,28 +157,26 @@ app.delete("/movies/:id", async (req, res) => {
 app.get("/movies/:genreName", async (req, res) => {
     //receber o nome do gênero pelo parâmetro da rota
     try {
-    //filtrar os filmes do banco pelo gênero
-    const moviesFilteredByGenreName = await prisma.movies.findMany({
-        include: {
-            genres: true,
-            languages: true,
-        },
-        where: {
-            genres: {
-                name: {
-                    equals: req.params.genreName,
-                    mode: "insensitive"
-                }
-            }
-        }
-    });
-    //retornar os filmes filtrados na resposta da rota
-    res.status(200).send(moviesFilteredByGenreName);
-
-}catch (error) {  res.status(500).send({ message: "Erro ao filtrar filmes por gênero" });
-}
-
-
+        //filtrar os filmes do banco pelo gênero
+        const moviesFilteredByGenreName = await prisma.movies.findMany({
+            include: {
+                genres: true,
+                languages: true,
+            },
+            where: {
+                genres: {
+                    name: {
+                        equals: req.params.genreName,
+                        mode: "insensitive",
+                    },
+                },
+            },
+        });
+        //retornar os filmes filtrados na resposta da rota
+        res.status(200).send(moviesFilteredByGenreName);
+    } catch (error) {
+        res.status(500).send({ message: "Erro ao filtrar filmes por gênero" });
+    }
 });
 //4 - Iniciar o servidor Express
 app.listen(port, () => {

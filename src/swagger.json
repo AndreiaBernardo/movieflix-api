@@ -5,6 +5,11 @@
         "version": "1.0.0",
         "description": "API para gerenciamento de filmes usando Express e Prisma"
     },
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
     "paths": {
         "/movies": {
             "get": {
@@ -12,14 +17,14 @@
                 "summary": "Listar todos os filmes",
                 "responses": {
                     "200": {
-                        "description": "Lista de filmes retornada com sucesso"
-                    },
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/Movie"
+                        "description": "Lista de filmes retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Movie"
+                                    }
                                 }
                             }
                         }
@@ -34,7 +39,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Movie"
+                                "$ref": "#/components/schemas/MovieInput"
                             }
                         }
                     }
@@ -42,30 +47,77 @@
                 "responses": {
                     "201": {
                         "description": "Filme criado com sucesso"
+                    },
+                    "409": {
+                        "description": "Já existe um filme cadastrado com esse título"
+                    },
+                    "500": {
+                        "description": "Erro ao criar filme"
                     }
                 }
             }
         },
         "/movies/{id}": {
-            "delete": {
+            "put": {
                 "tags": ["Movies"],
-                "summary": "Excluir um filme existente",
+                "summary": "Atualizar um filme existente",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
+                        "description": "ID do filme a ser atualizado",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MovieInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Filme atualizado com sucesso"
+                    },
+
+                    "404": {
+                        "description": "Filme não encontrado"
+                    },
+                    "500": {
+                        "description": "Erro ao atualizar filme"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Movies"],
+                "summary": "Remover um filme ",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID do filme a ser excluído",
                         "schema": {
                             "type": "integer"
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Filme excluído com sucesso"
                     },
                     "404": {
                         "description": "Filme não encontrado"
+                    },
+                    "500": {
+                        "description": "Erro ao excluir filme"
                     }
                 }
             }
@@ -85,32 +137,59 @@
                         "description": "Título do filme"
                     },
                     "genre_id": {
-                        "type": "string",
-                        "description": "Gênero do filme"
+                        "type": "integer",
+                        "description": "ID do gênero do filme"
                     },
                     "language_id": {
-                        "type": "string",
-                        "description": "Idioma do filme"
+                        "type": "integer",
+                        "description": "ID do idioma do filme"
                     },
                     "oscar_count": {
                         "type": "integer",
                         "description": "Número de Oscars ganhos pelo filme"
                     },
-
                     "release_date": {
                         "type": "string",
                         "format": "date",
                         "description": "Data de lançamento do filme"
                     }
-                },
-                "required": ["title", "release_date"]
+                }
+            },
+            "MovieInput": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "genre_id",
+                    "language_id",
+                    "oscar_count",
+                    "release_date"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genre_id": {
+                        "type": "integer",
+                        "description": "ID do gênero do filme"
+                    },
+                    "language_id": {
+                        "type": "integer",
+                        "description": "ID do idioma do filme"
+                    },
+                    "oscar_count": {
+                        "type": "integer",
+                        "description": "Número de Oscars ganhos pelo filme"
+                    },
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Data de lançamento do filme"
+                    }
+                }
+            
+            
             }
         }
-    },
-
-    "servers": [
-        {
-            "url": "http://localhost:3000"
-        }
-    ]
+    }
 }
